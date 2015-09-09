@@ -2,8 +2,10 @@ package girc
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"net"
+	"strings"
 )
 
 const (
@@ -17,7 +19,7 @@ type Client struct {
 	server   string
 	nick     string
 	realName string
-	rx       chan string
+	rx       chan []byte
 	tx       chan string
 	quit     chan bool
 }
@@ -33,7 +35,7 @@ func NewClient(s string, n string, r string) (*Client, error) {
 		return nil, err
 	}
 
-	rx := make(chan string)
+	rx := make(chan []byte)
 	tx := make(chan string)
 	q := make(chan bool)
 
@@ -47,7 +49,8 @@ func NewClient(s string, n string, r string) (*Client, error) {
 
 func (c *Client) listenServer() {
 	for {
-		message, err := bufio.NewReader(c.conn).ReadString('\n')
+		message, isPrefix, err := bufio.NewReader(c.conn).ReadLine()
+		fmt.Printf("isPefix: %v\n", isPrefix)
 		if err != nil {
 			fmt.Println(err)
 			c.Quit()
@@ -62,7 +65,8 @@ L:
 	for {
 		select {
 		case msg := <-c.rx:
-			fmt.Printf("SERVER: %s", msg)
+			fmt.Printf("SERVER: %s\n", msg)
+			c.parseMsg(msg)
 		case <-c.quit:
 			fmt.Println("Closing client")
 			break L
@@ -98,4 +102,15 @@ func (c *Client) Quit() {
 
 func (c *Client) write(msg string) {
 	fmt.Fprintf(c.conn, "%s\r\n", msg)
+}
+
+func (c *Client) parseMsg(msg []byte) error {
+	if len(msg) == 0 {
+		return errors.New("EOF")
+	}
+	str := string(msg[:len(msg)])
+
+	parameters := strings.Split(str, ":")
+	fmt.Printf("Parsed: %+v\n", parameters)
+	return nil
 }
