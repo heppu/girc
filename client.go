@@ -6,6 +6,12 @@ import (
 	"net"
 )
 
+const (
+	PASS = "PASS *"
+	NICK = "NICK %s"
+	USER = "USER %s 0 * :%s"
+)
+
 type Client struct {
 	conn     *net.TCPConn
 	server   string
@@ -67,9 +73,9 @@ L:
 
 func (c *Client) Connect() {
 	fmt.Println("CONNECT")
-	c.write("PASS *")
-	c.write("NICK heppu_girc")
-	c.write("USER heppu_girc 0 * :Go Botti")
+	c.write(PASS)
+	c.write(fmt.Sprintf(NICK, c.nick))
+	c.write(fmt.Sprintf(USER, c.nick, c.realName))
 }
 
 func (c *Client) Join() {
