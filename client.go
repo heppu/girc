@@ -92,6 +92,7 @@ func (c *Client) Quit() {
 	fmt.Println("QUIT")
 	c.quit <- true
 	<-c.quit
+	fmt.Println("Quit done")
 	return
 }
 
