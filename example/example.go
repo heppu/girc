@@ -9,7 +9,8 @@ import (
 
 func main() {
 	// Config
-	s := "irc.atw-inter.net:6667"
+	// s := "irc.atw-inter.net:6667"
+	s := "irc.ca.ircnet.net:6667"
 	n := "heppu_girc"
 	r := "Heppu Girc"
 

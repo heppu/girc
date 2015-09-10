@@ -14,6 +14,13 @@ const (
 	USER = "USER %s 0 * :%s"
 )
 
+type Message struct {
+	Prefix   string
+	Command  string
+	Params   []string
+	Trailing string
+}
+
 type Client struct {
 	conn     *net.TCPConn
 	server   string
@@ -49,8 +56,7 @@ func NewClient(s string, n string, r string) (*Client, error) {
 
 func (c *Client) listenServer() {
 	for {
-		message, isPrefix, err := bufio.NewReader(c.conn).ReadLine()
-		fmt.Printf("isPefix: %v\n", isPrefix)
+		message, _, err := bufio.NewReader(c.conn).ReadLine()
 		if err != nil {
 			fmt.Println(err)
 			c.Quit()
@@ -111,6 +117,8 @@ func (c *Client) parseMsg(msg []byte) error {
 	str := string(msg[:len(msg)])
 
 	parameters := strings.Split(str, ":")
-	fmt.Printf("Parsed: %+v\n", parameters)
+	for i, p := range parameters {
+		fmt.Printf("   Index %v: '%v'\n", i, p)
+	}
 	return nil
 }
