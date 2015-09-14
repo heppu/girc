@@ -31,7 +31,7 @@ func main() {
 		case "j\n":
 			c.Join()
 		case "h\n":
-			c.Send()
+			c.Privmsg()
 		default:
 			c.Quit()
 			return
